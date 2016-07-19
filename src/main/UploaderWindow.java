@@ -25,9 +25,9 @@ public class UploaderWindow implements Runnable {
         controller = null;
         window = new Stage();
         textArea = newTextArea();
-        statusLabel = new Label("Connecting to FTP server...");
+        statusLabel = new Label("");
         progressBar = new ProgressBar();
-        percentLabel = new Label("0.0%");
+        percentLabel = new Label("");
         cancelButton = newCancelButton();
         closeButton = newCloseButton();
     }

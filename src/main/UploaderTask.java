@@ -199,7 +199,7 @@ public class UploaderTask extends Task<UploaderTaskResult> {
     private String getSuccessMessage(long millis) {
         StringBuilder message = new StringBuilder();
         if(files.size() == 1) {
-            message.append(+files.size()+" file was successfully uploaded over ");
+            message.append(files.size()+" file was successfully uploaded over ");
         } else {
             message.append(files.size()+" files were successfully uploaded over ");
         }
