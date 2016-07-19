@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="AutoUploadFiles:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/AutoUploadFiles_jar</output-path>
+    <root id="archive" name="AutoUploadFiles.jar">
+      <element id="module-output" name="AutoUploadFiles" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/commons-net-3.5/commons-net-3.5.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
