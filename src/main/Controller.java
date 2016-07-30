@@ -45,16 +45,16 @@ public class Controller extends Application {
 
     /**
      * Starts the {@link javafx.concurrent.Task} {@link Thread} that executes the FTP file upload.
-     * @param hostname      hostname for the FTP server
-     * @param port          port for the FTP server
-     * @param username      username for the FTP server login
-     * @param password      password for the FTP server login
-     * @param uploadPath    path on FTP server to upload to
-     * @param reuseSsl      reuse or create new SSL context for upload connection
-     * @param passiveMode   passive or active mode for the FTP server
-     * @param implicit      implicit or explicit connection for the FTP server
-     * @param printErrors   redirect error {@link PrintStream} for errors, used for debugging error messages
-     * @param files         {@link File}(s) to upload to the FTP server
+     * @param hostname      Hostname for the FTP server.
+     * @param port          Port for the FTP server.
+     * @param username      Username for the FTP server login.
+     * @param password      Password for the FTP server login.
+     * @param uploadPath    Path on FTP server to upload to.
+     * @param reuseSsl      Reuse or create new SSL context for upload connection.
+     * @param passiveMode   Passive or active mode for the FTP server.
+     * @param implicit      Implicit or explicit connection for the FTP server.
+     * @param printErrors   Redirect error {@link PrintStream} for errors, used for debugging error messages.
+     * @param files         {@link File}(s) to upload to the FTP server.
      */
     public void startUploaderTask(String hostname, int port, String username, String password, String uploadPath,
                                   boolean reuseSsl, boolean passiveMode, boolean implicit, boolean printErrors, List<File> files) {
@@ -89,8 +89,8 @@ public class Controller extends Application {
 
     /**
      * Redirects {@link System}.out to {@link PrintStream} {@param prs}.
-     * @param prs           {@link PrintStream} to redirect {@link System}.out to
-     * @param transferErrors    does or does not redirect {@link System}.err to {@param prs}, used for debugging
+     * @param prs               {@link PrintStream} to redirect {@link System}.out to.
+     * @param transferErrors    Does or does not redirect {@link System}.err to {@param prs}, used for debugging.
      */
     public void redirectOutput(PrintStream prs, boolean transferErrors) {
         System.setOut(prs);
@@ -101,8 +101,8 @@ public class Controller extends Application {
 
     /**
      * Creates an {@link Alert} showing the {@param message} and the icon {@alertType}.
-     * @param message   The text of the message shown in the {@link Alert}
-     * @param alertType The icon shown in the {@link Alert} to designate success/failure/error
+     * @param message   The text of the message shown in the {@link Alert}.
+     * @param alertType The icon shown in the {@link Alert} to designate success/failure/error.
      */
     public void showAlert(String message, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
