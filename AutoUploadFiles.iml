@@ -10,11 +10,11 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../Java Libraries/commons-net-3.5/commons-net-3.5.jar!/" />
+          <root url="jar://$USER_HOME$/Documents/Java Libraries/commons-net-3.5/commons-net-3.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../../Java Libraries/commons-net-3.5/commons-net-3.5-sources.jar!/" />
+          <root url="jar://$USER_HOME$/Documents/Java Libraries/commons-net-3.5/commons-net-3.5-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
