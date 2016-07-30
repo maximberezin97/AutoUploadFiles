@@ -22,6 +22,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * An extension of JavaFX's {@link Task} to be run in a new thread separate from
+ * the JavaFX Application Thread. Upon call, creates an FTP client instance,
+ * configures connection to the server, and uploads the file(s) to the server.
+ * Returns an {@link UploaderTaskResult} that contains the message and alert type
+ * for the {@link Controller}, whether successful or failed.
+ */
 public class UploaderTask extends Task<UploaderTaskResult> {
     private Controller controller;
     private String hostname;
@@ -38,6 +45,10 @@ public class UploaderTask extends Task<UploaderTaskResult> {
     private FTPSClient ftp;
     private StringProperty stringProperty;
 
+    /**
+     * Empty constructor for {@link UploaderTask}. Most values are set to empty non-null,
+     * file and FTP values left null.
+     */
     public UploaderTask() {
         this.controller = null;
         this.hostname = "";
@@ -53,10 +64,32 @@ public class UploaderTask extends Task<UploaderTaskResult> {
         this.currentFile = null;
         this.stringProperty = new SimpleStringProperty("");
     }
+
+    /**
+     * Constructor for {@link UploaderTask}, calls empty constructor,
+     * then sets provided {@link Controller}.
+     * @param controller Controller class of the program.
+     */
     public UploaderTask(Controller controller) {
         this();
         this.controller = controller;
     }
+
+    /**
+     * Constructor for {@link UploaderTask}. Calls {@link Controller} constructor,
+     * then sets FTP values.
+     * @param controller    Controller class of the program.
+     * @param hostname      Hostname of the FTP server.
+     * @param port          Port of the FTP server.
+     * @param username      Username for the FTP server login.
+     * @param password      Password for the FTP server login.
+     * @param uploadPath    Path on FTP server to upload the file(s) to.
+     * @param reuseSsl      Reuse or create new SSL context.
+     * @param passiveMode   Passive or active mode connection.
+     * @param implicit      Implicit or explicit connection.
+     * @param printErrors   Print errors in console or {@link UploaderWindow}, used for debugging.
+     * @param files         File(s) to upload to FTP server.
+     */
     public UploaderTask(Controller controller, String hostname, int port, String username, String password, String uploadPath,
                         boolean reuseSsl, boolean passiveMode, boolean implicit, boolean printErrors, List<File> files) {
         this(controller);
@@ -72,6 +105,10 @@ public class UploaderTask extends Task<UploaderTaskResult> {
         this.files = files;
     }
 
+    /**
+     * Override of {@link Task}.call(), starts the task in the thread.
+     * @return Result of task to be shown in an alert by {@link Controller}.
+     */
     @Override
     protected UploaderTaskResult call() {
         UploaderTaskResult result;
@@ -83,7 +120,14 @@ public class UploaderTask extends Task<UploaderTaskResult> {
         }
         return result;
     }
-    private UploaderTaskResult executeFileUpload() throws Exception {
+
+    /**
+     * Creates the FTP client instance and uploads the file(s) to the FTP server.
+     * Uses the designated FTP values and print stream.
+     * @return              {@link UploaderTaskResult} of the FTP file upload to be shown in an alert by {@link Controller}.
+     * @throws IOException  If thrown by FTP client command functions.
+     */
+    private UploaderTaskResult executeFileUpload() throws IOException {
         UploaderTaskResult result;
         long timeStart;
         long timeEnd;
@@ -121,8 +165,8 @@ public class UploaderTask extends Task<UploaderTaskResult> {
                 InputStream fileStream;
                 timeStart = System.currentTimeMillis();
                 for(Iterator<File> it = files.iterator(); it.hasNext();) {
+                    currentFile = it.next();
                     if(!isCancelled()) {
-                        currentFile = it.next();
                         updateTitle("Uploading file \""+currentFile.getName()+"\"...");
                         fileStream = new FileInputStream(currentFile);
                         fileStored = ftp.storeFile(currentFile.getName(), fileStream);
@@ -144,6 +188,11 @@ public class UploaderTask extends Task<UploaderTaskResult> {
         return result;
     }
 
+    /**
+     * Returns an {@link FTPSClient} instance as provided by the Apache Commons Net library.
+     * @param isExplicit    Explicit or implicit connection.
+     * @return              {@link FTPSClient} with standard storeFile().
+     */
     private FTPSClient getRegFtpsClient(boolean isExplicit) {
         return new FTPSClient(isExplicit) {
             @Override
@@ -152,6 +201,12 @@ public class UploaderTask extends Task<UploaderTaskResult> {
             }
         };
     }
+
+    /**
+     * Returns an {@link FTPSClient} instance that creates a new SSL data socket for storeFile().
+     * @param isExplicit    Explicit or implicit connection.
+     * @return              {@link FTPSClient} with overridden _prepareDataSocket_().
+     */
     private FTPSClient getAltFtpsClient(boolean isExplicit) {
         return new FTPSClient(isExplicit) {
             @Override
@@ -177,6 +232,12 @@ public class UploaderTask extends Task<UploaderTaskResult> {
             }
         };
     }
+
+    /**
+     * Returns a new {@link PrintStream} that updates the {@link StringProperty}
+     * of this uploader task upon calling the write(int) function.
+     * @return  {@link PrintStream} with overridden write(int).
+     */
     private PrintStream newPrintStream() {
         return new PrintStream(new OutputStream() {
             @Override
@@ -185,6 +246,13 @@ public class UploaderTask extends Task<UploaderTaskResult> {
             }
         });
     }
+
+    /**
+     * Returns a new {@link CopyStreamAdapter} that updates the Progress property
+     * of this uploader task upon calling the bytesTransferred(long, int, long) function.
+     * Called when {@link FTPSClient}.storeFile() stores an array of bytes to the FTP server.
+     * @return {@link CopyStreamAdapter} with overridden bytesTransferred(long, int, long).
+     */
     private CopyStreamAdapter newCopyStreamAdapter() {
         return new CopyStreamAdapter() {
             @Override
@@ -193,59 +261,107 @@ public class UploaderTask extends Task<UploaderTaskResult> {
             }
         };
     }
+
+    /**
+     * Attempts to cancel the FTP upload by sending the "ABOR" command to the FTP server.
+     * @return              Successful or failed "ABOR" command execution.
+     * @throws IOException  If thrown by FTP client command function.
+     */
     public boolean cancelFtpUpload() throws IOException {
         return ftp.abort();
     }
+
+    /**
+     * Creates a message to show in an alert if the FTP file upload was successful.
+     * @param millis    Time length of FTP file upload in milliseconds.
+     * @return          {@link String} of the message for the alert.
+     */
     private String getSuccessMessage(long millis) {
         StringBuilder message = new StringBuilder();
-        if(files.size() == 1) {
-            message.append(files.size()+" file was successfully uploaded over ");
+        int fileQuantity = files.size();
+        message.append(fileQuantity);
+        if(fileQuantity == 1) {
+            message.append(" file was successfully uploaded over ");
         } else {
-            message.append(files.size()+" files were successfully uploaded over ");
+            message.append(" files were successfully uploaded over ");
         }
         long seconds = millis/1000;
         if(seconds >= 60) {
             long minutes = seconds/60;
             seconds = seconds%60;
+            message.append(minutes);
             if(minutes == 1) {
-                message.append(minutes+" minute");
+                message.append(" minute");
             } else {
-                message.append(minutes+" minutes");
+                message.append(" minutes");
             }
+            message.append(" and ");
+            message.append(seconds);
             if(seconds > 1) {
-                message.append(" and "+seconds+" seconds");
+                message.append(" seconds");
             } else if(seconds == 1) {
-                message.append(" and "+seconds+" second");
+                message.append(" second");
             }
             message.append(".");
         } else {
+            message.append(seconds);
             if(seconds == 1) {
-                message.append(seconds+" second.");
+                message.append(" second.");
             } else {
-                message.append(seconds+" seconds.");
+                message.append(" seconds.");
             }
         }
         return message.toString();
     }
+
+    /**
+     * Returns the {@link StringProperty} contained in this uploader task.
+     * This is a manually implemented {@link StringProperty} and is not
+     * one of the {@link javafx.beans.property.Property} values automatically
+     * created for a standard {@link Task}, such as progress, title, or message.
+     * May be removed in the future and replaced with message, which will need
+     * its updateMessage(String) overridden to run under {@link Platform}.runLater().
+     * When previously used, message did not update with the console properly.
+     * @return  {@link StringProperty} of this uploader task.
+     */
     public final StringProperty stringProperty() {
         return stringProperty;
     }
+
+    /**
+     * Returns the string contained in the {@link StringProperty}.
+     * @return  String in the {@link StringProperty}.
+     */
     public final String getString() {
         return stringProperty.get();
     }
+
+    /**
+     * Sets the value of the {@link StringProperty}, removing its previous value.
+     * @param set   The new value of the {@link StringProperty}.
+     */
     public final void setString(String set) {
         stringProperty.set(set);
     }
+
+    /**
+     * Appends the value of the set parameter to the previous value of the {@link StringProperty}.
+     * @param set   The value to add to the {@link StringProperty}.
+     */
     public final void appendString(String set) {
         setString(getString()+set);
     }
+
+    /**
+     * Appends the value of the set parameter to the previous value of the {@link StringProperty}.
+     * Uses {@link Platform}.runLater() if there is information crossing threads.
+     * @param set   The value to add to the {@link StringProperty}.
+     */
     public final void updateString(String set) {
         if(Platform.isFxApplicationThread()) {
             appendString(set);
         } else {
-            Platform.runLater(() -> {
-                appendString(set);
-            });
+            Platform.runLater(() -> appendString(set));
         }
     }
 }
