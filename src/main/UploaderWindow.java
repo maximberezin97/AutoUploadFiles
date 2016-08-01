@@ -11,6 +11,16 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+/**
+ * The window used to show the status of the FTP upload.
+ * Features a status label, progress bar and percentage indicator,
+ * a console showing the FTP commands being sent between this client
+ * and the server, which can also show errors if debug was checked,
+ * as well as cancel and close buttons.
+ * Status, progress, and percentage indicators are bound to their
+ * respective {@link javafx.beans.property.Property} values
+ * in the {@link UploaderTask} and are updated between {@link Thread}s.
+ */
 public class UploaderWindow implements Runnable {
     private Controller controller;
     private Stage window;
@@ -21,6 +31,10 @@ public class UploaderWindow implements Runnable {
     private Button cancelButton;
     private Button closeButton;
 
+    /**
+     * Empty constructor for the uploader window.
+     * Initializes all declared fields to default values.
+     */
     public UploaderWindow() {
         controller = null;
         window = new Stage();
@@ -31,15 +45,28 @@ public class UploaderWindow implements Runnable {
         cancelButton = newCancelButton();
         closeButton = newCloseButton();
     }
+
+    /**
+     * Constructor that takes in the {@link Controller}.
+     * @param controller    Main {@link Controller} instance of the program.
+     */
     public UploaderWindow(Controller controller) {
         this();
         this.controller = controller;
     }
 
+    /**
+     * Overrides the {@link Runnable}.run() method.
+     * Runs this class in a unique thread.
+     */
     @Override
     public void run() {
         initUploaderWindow();
     }
+
+    /**
+     * Constructs the window from initialized fields and shows it.
+     */
     private void initUploaderWindow() {
         window.setTitle(controller.getDialogTitle());
         window.getIcons().add(controller.getIcon());
@@ -88,6 +115,11 @@ public class UploaderWindow implements Runnable {
         window.show();
     }
 
+    /**
+     * Constructs a new {@link TextArea} for the console that
+     * listens for updates and scrolls to the bottom automatically.
+     * @return  {@link TextArea} for the console.
+     */
     private TextArea newTextArea() {
         TextArea textArea = new TextArea("");
         textArea.setWrapText(false);
@@ -99,6 +131,11 @@ public class UploaderWindow implements Runnable {
         });
         return textArea;
     }
+
+    /**
+     * Returns a new {@link Button} that cancels the {@link UploaderTask}.
+     * @return  {@link Button} that cancels the upload.
+     */
     private Button newCancelButton() {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> {
@@ -107,6 +144,14 @@ public class UploaderWindow implements Runnable {
         cancelButton.setCancelButton(true);
         return cancelButton;
     }
+
+    /**
+     * Returns a new {@link Button} that closes the {@link UploaderWindow}
+     * and returns console output to {@link System}.out.
+     * Cancels the {@link UploaderTask} if it is running.
+     * @return  {@link Button} that closes the window and cancels the upload
+     *          if running.
+     */
     private Button newCloseButton() {
         Button closeButton = new Button("Close");
         closeButton.setOnAction(e -> {
