@@ -19,7 +19,7 @@ import java.util.List;
  * Used to configure the information in preparation for the upload.
  * Has fields for connection, login, and upload information,
  * checkboxes for connection and debugging settings,
- * and buttons & lists to show the selected file(s) and begin connection.
+ * and buttons and lists to show the selected file(s) and begin connection.
  */
 public class MainWindow implements Runnable {
     private Controller controller;

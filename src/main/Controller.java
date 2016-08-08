@@ -88,9 +88,9 @@ public class Controller extends Application {
     }
 
     /**
-     * Redirects {@link System}.out to {@link PrintStream} {@param prs}.
+     * Redirects System.out to {@link PrintStream} prs.
      * @param prs               {@link PrintStream} to redirect {@link System}.out to.
-     * @param transferErrors    Does or does not redirect {@link System}.err to {@param prs}, used for debugging.
+     * @param transferErrors    Does or does not redirect System.err to prs, used for debugging.
      */
     public void redirectOutput(PrintStream prs, boolean transferErrors) {
         System.setOut(prs);
@@ -100,7 +100,7 @@ public class Controller extends Application {
     }
 
     /**
-     * Creates an {@link Alert} showing the {@param message} and the icon {@alertType}.
+     * Creates an {@link Alert} showing the message and the icon AlertType.
      * @param message   The text of the message shown in the {@link Alert}.
      * @param alertType The icon shown in the {@link Alert} to designate success/failure/error.
      */
