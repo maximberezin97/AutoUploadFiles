@@ -22,7 +22,7 @@ import javafx.stage.Stage;
  * in the {@link UploaderTask} and are updated between {@link Thread}s.
  */
 public class UploaderWindow implements Runnable {
-    private Controller controller;
+    private AutoUploadFiles autoUploadFiles;
     private Stage window;
     private TextArea textArea;
     private Label statusLabel;
@@ -36,7 +36,7 @@ public class UploaderWindow implements Runnable {
      * Initializes all declared fields to default values.
      */
     public UploaderWindow() {
-        controller = null;
+        autoUploadFiles = null;
         window = new Stage();
         textArea = newTextArea();
         statusLabel = new Label("");
@@ -47,12 +47,12 @@ public class UploaderWindow implements Runnable {
     }
 
     /**
-     * Constructor that takes in the {@link Controller}.
-     * @param controller    Main {@link Controller} instance of the program.
+     * Constructor that takes in the {@link AutoUploadFiles}.
+     * @param autoUploadFiles    Main {@link AutoUploadFiles} instance of the program.
      */
-    public UploaderWindow(Controller controller) {
+    public UploaderWindow(AutoUploadFiles autoUploadFiles) {
         this();
-        this.controller = controller;
+        this.autoUploadFiles = autoUploadFiles;
     }
 
     /**
@@ -68,18 +68,18 @@ public class UploaderWindow implements Runnable {
      * Constructs the window from initialized fields and shows it.
      */
     private void initUploaderWindow() {
-        window.setTitle(controller.getDialogTitle());
-        window.getIcons().add(controller.getIcon());
+        window.setTitle(autoUploadFiles.getDialogTitle());
+        window.getIcons().add(autoUploadFiles.getIcon());
         window.setResizable(true);
 
         statusLabel.textProperty().unbind();
-        statusLabel.textProperty().bind(controller.getUploaderTask().titleProperty());
+        statusLabel.textProperty().bind(autoUploadFiles.getUploaderTask().titleProperty());
         progressBar.progressProperty().unbind();
-        progressBar.progressProperty().bind(controller.getUploaderTask().progressProperty());
+        progressBar.progressProperty().bind(autoUploadFiles.getUploaderTask().progressProperty());
         percentLabel.textProperty().unbind();
-        percentLabel.textProperty().bind(controller.getUploaderTask().progressProperty().multiply(100).asString("%.2f").concat("%"));
+        percentLabel.textProperty().bind(autoUploadFiles.getUploaderTask().progressProperty().multiply(100).asString("%.2f").concat("%"));
         textArea.textProperty().unbind();
-        textArea.textProperty().bind(controller.getUploaderTask().stringProperty());
+        textArea.textProperty().bind(autoUploadFiles.getUploaderTask().stringProperty());
 
         progressBar.setMaxWidth(Double.MAX_VALUE);
         VBox vboxProgressBar = new VBox(progressBar);
@@ -139,7 +139,7 @@ public class UploaderWindow implements Runnable {
     private Button newCancelButton() {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> {
-            controller.cancelUploaderTask();
+            autoUploadFiles.cancelUploaderTask();
         });
         cancelButton.setCancelButton(true);
         return cancelButton;
@@ -155,11 +155,11 @@ public class UploaderWindow implements Runnable {
     private Button newCloseButton() {
         Button closeButton = new Button("Close");
         closeButton.setOnAction(e -> {
-            controller.redirectOutput(System.out, true);
+            autoUploadFiles.redirectOutput(System.out, true);
             Stage stage = (Stage) closeButton.getScene().getWindow();
             stage.close();
-            if(controller.getUploaderTask().isRunning()) {
-                controller.cancelUploaderTask();
+            if(autoUploadFiles.getUploaderTask().isRunning()) {
+                autoUploadFiles.cancelUploaderTask();
             }
         });
         closeButton.setCancelButton(true);

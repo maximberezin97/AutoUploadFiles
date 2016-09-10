@@ -27,10 +27,10 @@ import java.util.Locale;
  * the JavaFX Application Thread. Upon call, creates an FTP client instance,
  * configures connection to the server, and uploads the file(s) to the server.
  * Returns an {@link UploaderTaskResult} that contains the message and alert type
- * for the {@link Controller}, whether successful or failed.
+ * for the {@link AutoUploadFiles}, whether successful or failed.
  */
 public class UploaderTask extends Task<UploaderTaskResult> {
-    private Controller controller;
+    private AutoUploadFiles autoUploadFiles;
     private String hostname;
     private int port;
     private String username;
@@ -50,7 +50,7 @@ public class UploaderTask extends Task<UploaderTaskResult> {
      * file and FTP values left null.
      */
     public UploaderTask() {
-        this.controller = null;
+        this.autoUploadFiles = null;
         this.hostname = "";
         this.port = -1;
         this.username = "";
@@ -67,18 +67,18 @@ public class UploaderTask extends Task<UploaderTaskResult> {
 
     /**
      * Constructor for {@link UploaderTask}, calls empty constructor,
-     * then sets provided {@link Controller}.
-     * @param controller Controller class of the program.
+     * then sets provided {@link AutoUploadFiles}.
+     * @param autoUploadFiles AutoUploadFiles class of the program.
      */
-    public UploaderTask(Controller controller) {
+    public UploaderTask(AutoUploadFiles autoUploadFiles) {
         this();
-        this.controller = controller;
+        this.autoUploadFiles = autoUploadFiles;
     }
 
     /**
-     * Constructor for {@link UploaderTask}. Calls {@link Controller} constructor,
+     * Constructor for {@link UploaderTask}. Calls {@link AutoUploadFiles} constructor,
      * then sets FTP values.
-     * @param controller    Controller class of the program.
+     * @param autoUploadFiles    AutoUploadFiles class of the program.
      * @param hostname      Hostname of the FTP server.
      * @param port          Port of the FTP server.
      * @param username      Username for the FTP server login.
@@ -90,9 +90,9 @@ public class UploaderTask extends Task<UploaderTaskResult> {
      * @param printErrors   Print errors in console or {@link UploaderWindow}, used for debugging.
      * @param files         File(s) to upload to FTP server.
      */
-    public UploaderTask(Controller controller, String hostname, int port, String username, String password, String uploadPath,
+    public UploaderTask(AutoUploadFiles autoUploadFiles, String hostname, int port, String username, String password, String uploadPath,
                         boolean reuseSsl, boolean passiveMode, boolean implicit, boolean printErrors, List<File> files) {
-        this(controller);
+        this(autoUploadFiles);
         this.hostname = hostname;
         this.port = port;
         this.username = username;
@@ -107,7 +107,7 @@ public class UploaderTask extends Task<UploaderTaskResult> {
 
     /**
      * Override of {@link Task}.call(), starts the task in the thread.
-     * @return Result of task to be shown in an alert by {@link Controller}.
+     * @return Result of task to be shown in an alert by {@link AutoUploadFiles}.
      */
     @Override
     protected UploaderTaskResult call() {
@@ -124,7 +124,7 @@ public class UploaderTask extends Task<UploaderTaskResult> {
     /**
      * Creates the FTP client instance and uploads the file(s) to the FTP server.
      * Uses the designated FTP values and print stream.
-     * @return              {@link UploaderTaskResult} of the FTP file upload to be shown in an alert by {@link Controller}.
+     * @return              {@link UploaderTaskResult} of the FTP file upload to be shown in an alert by {@link AutoUploadFiles}.
      * @throws IOException  If thrown by FTP client command functions.
      */
     private UploaderTaskResult executeFileUpload() throws IOException {
@@ -140,7 +140,7 @@ public class UploaderTask extends Task<UploaderTaskResult> {
         }
 
         PrintStream printStream = newPrintStream();
-        controller.redirectOutput(printStream, printErrors);
+        autoUploadFiles.redirectOutput(printStream, printErrors);
         ftp.addProtocolCommandListener(new PrintCommandListener(printStream, true));
         ftp.setCopyStreamListener(newCopyStreamAdapter());
 

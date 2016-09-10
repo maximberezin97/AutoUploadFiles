@@ -22,7 +22,7 @@ import java.util.List;
  * and buttons and lists to show the selected file(s) and begin connection.
  */
 public class MainWindow implements Runnable {
-    private Controller controller;
+    private AutoUploadFiles autoUploadFiles;
     private List<File> files;
     private Stage window;
     private Label hostnameLabel;
@@ -68,17 +68,17 @@ public class MainWindow implements Runnable {
         passiveModeCheckbox = newCheckbox(true, newPassiveModeTooltip());
         explicitCheckbox = newCheckbox(true, newExplicitTooltip());
         printErrorsCheckbox = newCheckbox(true, newPrintErrorsTooltip());
-        controller = null;
+        autoUploadFiles = null;
     }
 
     /**
-     * Constructor that takes in the {@link Controller} and a given {@link Stage}.
-     * @param controller    Main {@link Controller} instance of the program.
+     * Constructor that takes in the {@link AutoUploadFiles} and a given {@link Stage}.
+     * @param autoUploadFiles    Main {@link AutoUploadFiles} instance of the program.
      * @param primaryStage  {@link Stage} given from call to be shown.
      */
-    public MainWindow(Controller controller, Stage primaryStage) {
+    public MainWindow(AutoUploadFiles autoUploadFiles, Stage primaryStage) {
         this();
-        this.controller = controller;
+        this.autoUploadFiles = autoUploadFiles;
         this.window = primaryStage;
     }
 
@@ -95,8 +95,8 @@ public class MainWindow implements Runnable {
      * Constructs the window from initialized fields and shows it.
      */
     private void initMainWindow() {
-        window.setTitle(controller.getDialogTitle());
-        window.getIcons().add(controller.getIcon());
+        window.setTitle(autoUploadFiles.getDialogTitle());
+        window.getIcons().add(autoUploadFiles.getIcon());
 
         GridPane gridTop = new GridPane();
         gridTop.setHgap(10);
@@ -149,7 +149,7 @@ public class MainWindow implements Runnable {
      */
     private TextField newHostnameInput() {
         TextField hostnameInput = new TextField();
-        hostnameInput.setPrefColumnCount(controller.getTextFieldWidth());
+        hostnameInput.setPrefColumnCount(autoUploadFiles.getTextFieldWidth());
         hostnameInput.setPromptText("Enter the hostname here...");
         hostnameInput.setTooltip(new Tooltip("Hostname of FTP server"));
         return hostnameInput;
@@ -161,7 +161,7 @@ public class MainWindow implements Runnable {
      */
     private TextField newPortInput() {
         TextField portInput = new TextField();
-        portInput.setPrefColumnCount(controller.getTextFieldWidth());
+        portInput.setPrefColumnCount(autoUploadFiles.getTextFieldWidth());
         portInput.setPromptText("Enter the port here...");
         portInput.setTooltip(new Tooltip("Port of FTP server"));
         return portInput;
@@ -173,7 +173,7 @@ public class MainWindow implements Runnable {
      */
     private TextField newUsernameInput() {
         TextField usernameInput = new TextField();
-        usernameInput.setPrefColumnCount(controller.getTextFieldWidth());
+        usernameInput.setPrefColumnCount(autoUploadFiles.getTextFieldWidth());
         usernameInput.setPromptText("Enter the username here...");
         usernameInput.setTooltip(new Tooltip("Username for the FTP server"));
         return usernameInput;
@@ -185,7 +185,7 @@ public class MainWindow implements Runnable {
      */
     private PasswordField newPasswordInput() {
         PasswordField passwordInput = new PasswordField();
-        passwordInput.setPrefColumnCount(controller.getTextFieldWidth());
+        passwordInput.setPrefColumnCount(autoUploadFiles.getTextFieldWidth());
         passwordInput.setPromptText("Enter the password here...");
         passwordInput.setTooltip(new Tooltip("Password for the FTP server"));
         return passwordInput;
@@ -197,7 +197,7 @@ public class MainWindow implements Runnable {
      */
     private TextField newUploadPathInput() {
         TextField uploadPathInput = new TextField();
-        uploadPathInput.setPrefColumnCount(controller.getTextFieldWidth());
+        uploadPathInput.setPrefColumnCount(autoUploadFiles.getTextFieldWidth());
         uploadPathInput.setPromptText("Enter the upload path here...");
         uploadPathInput.setTooltip(new Tooltip("Path on the FTP server to upload the file(s) to"));
         return uploadPathInput;
@@ -284,7 +284,7 @@ public class MainWindow implements Runnable {
     /**
      * Returns a new {@link Button} that retrieves the fields' configurations
      * and either alerts the user to enter valid configurations, or tells the
-     * the {@link Controller} to start the {@link UploaderTask}.
+     * the {@link AutoUploadFiles} to start the {@link UploaderTask}.
      * @return  {@link Button} to begin connection and upload.
      */
     private Button newConnectButton() {
@@ -301,21 +301,21 @@ public class MainWindow implements Runnable {
                 boolean implicit = !explicitCheckbox.isSelected();
                 boolean printErrors = printErrorsCheckbox.isSelected();
                 if(hostname.equals("")) {
-                    controller.showAlert("Please enter the hostname.", Alert.AlertType.WARNING);
+                    autoUploadFiles.showAlert("Please enter the hostname.", Alert.AlertType.WARNING);
                 } else if(port == -1) {
-                    controller.showAlert("Please enter a valid port number.", Alert.AlertType.WARNING);
+                    autoUploadFiles.showAlert("Please enter a valid port number.", Alert.AlertType.WARNING);
                 } else if(username.equals("")) {
-                    controller.showAlert("Please enter the username.", Alert.AlertType.WARNING);
+                    autoUploadFiles.showAlert("Please enter the username.", Alert.AlertType.WARNING);
                 } else if(password.equals("")) {
-                    controller.showAlert("Please enter the password.", Alert.AlertType.WARNING);
+                    autoUploadFiles.showAlert("Please enter the password.", Alert.AlertType.WARNING);
                 } else if (uploadPath.equals("")) {
-                    controller.showAlert("Please enter the upload path.", Alert.AlertType.WARNING);
+                    autoUploadFiles.showAlert("Please enter the upload path.", Alert.AlertType.WARNING);
                 } else {
-                    controller.startUploaderTask(hostname, port, username, password, uploadPath,
+                    autoUploadFiles.startUploaderTask(hostname, port, username, password, uploadPath,
                             reuseSsl, passiveMode, implicit, printErrors, files);
                 }
             } else {
-                controller.showAlert("Please select the file(s).", Alert.AlertType.WARNING);
+                autoUploadFiles.showAlert("Please select the file(s).", Alert.AlertType.WARNING);
             }
         });
         connectButton.setTooltip(new Tooltip("Connect to FTP server, upload file(s)"));

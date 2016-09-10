@@ -18,9 +18,9 @@ import java.util.List;
  * Also handles the creation and management of JavaFX Application Thread
  * and the Task thread.
  */
-public class Controller extends Application {
+public class AutoUploadFiles extends Application {
     public static final String name = "AutoUploadFiles";
-    public static final String version = "3.6";
+    public static final String version = "3.7";
     public static final String dialogTitle = name+" "+version;
     public Image icon = new Image(getClass().getResourceAsStream("icon.png"));
     public static int textFieldWidth = 25;

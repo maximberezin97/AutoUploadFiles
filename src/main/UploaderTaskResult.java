@@ -3,7 +3,7 @@ package main;
 import javafx.scene.control.Alert;
 
 /**
- * Container for information used for {@link Controller} to generate an {@link Alert}.
+ * Container for information used for {@link AutoUploadFiles} to generate an {@link Alert}.
  * Contains a {@link String} message and an {@link javafx.scene.control.Alert.AlertType} for the icon.
  */
 public class UploaderTaskResult {
