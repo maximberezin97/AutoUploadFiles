@@ -3,6 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/AutoUploadFiles_jar</output-path>
     <root id="archive" name="AutoUploadFiles.jar">
       <element id="module-output" name="AutoUploadFiles" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/commons-net-3.5.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
