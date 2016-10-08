@@ -6,10 +6,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * The main controller class of the JavaFX program.
@@ -20,12 +19,13 @@ import java.util.List;
  */
 public class AutoUploadFiles extends Application {
     public static final String name = "AutoUploadFiles";
-    public static final String version = "3.7";
+    public static final String version = "3.8";
     public static final String dialogTitle = name+" "+version;
-    public Image icon = new Image(getClass().getResourceAsStream("icon.png"));
     public static int textFieldWidth = 25;
-
+    public Image icon = new Image(getClass().getResourceAsStream("icon.png"));
     private UploaderTask uploaderTask;
+    private Properties properties;
+    private File propertiesFile = new File("autoUploadFiles.properties");
 
     public static void main(String[] args) {
         launch(args);
@@ -39,12 +39,20 @@ public class AutoUploadFiles extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
+        properties = new Properties();
+        if(propertiesFile.exists()) {
+            FileInputStream inputStream = new FileInputStream("autoUploadFiles.properties");
+            properties.load(inputStream);
+            inputStream.close();
+        }
         MainWindow mainWindow = new MainWindow(this, primaryStage);
         mainWindow.run();
     }
 
     /**
      * Starts the {@link javafx.concurrent.Task} {@link Thread} that executes the FTP file upload.
+     * If user wants to save settings, current values of hostname, port, username, and uploadPath
+     * will be saved for future use.
      * @param hostname      Hostname for the FTP server.
      * @param port          Port for the FTP server.
      * @param username      Username for the FTP server login.
@@ -88,6 +96,23 @@ public class AutoUploadFiles extends Application {
     }
 
     /**
+     * Saves settings if checkbox is checked and exits program.
+     * @param saveSettings  Saves settings if checkbox is checked.
+     */
+    public void exit(boolean saveSettings) {
+        if(saveSettings) {
+            try {
+                FileOutputStream outputStream = new FileOutputStream("autoUploadFiles.properties");
+                properties.store(outputStream, null);
+                outputStream.close();
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+        System.exit(0);
+    }
+
+    /**
      * Redirects System.out to {@link PrintStream} prs.
      * @param prs               {@link PrintStream} to redirect {@link System}.out to.
      * @param transferErrors    Does or does not redirect System.err to prs, used for debugging.
@@ -121,6 +146,14 @@ public class AutoUploadFiles extends Application {
      */
     public UploaderTask getUploaderTask() {
         return uploaderTask;
+    }
+
+    /**
+     * Returns the current instance of {@link Properties} in use.
+     * @return  Current instance of {@link Properties}.
+     */
+    public Properties getProperties() {
+        return properties;
     }
 
     /**
