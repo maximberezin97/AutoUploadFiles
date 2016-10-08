@@ -177,48 +177,6 @@ public class MainWindow implements Runnable {
     }
 
     /**
-     * Returns a new {@link TextField} for the hostname.
-     * @return      {@link TextField} for hostname.
-     * @deprecated  Use {@link #newTextField(String, Tooltip)} instead.
-     */
-    @Deprecated
-    private TextField newHostnameInput() {
-        TextField hostnameInput = new TextField();
-        hostnameInput.setPrefColumnCount(autoUploadFiles.getTextFieldWidth());
-        hostnameInput.setPromptText("Enter the hostname here...");
-        hostnameInput.setTooltip(new Tooltip("Hostname of FTP server"));
-        return hostnameInput;
-    }
-
-    /**
-     * Returns a new {@link TextField} for the port number.
-     * @return      {@link TextField} for the port number.
-     * @deprecated  Use {@link #newTextField(String, Tooltip)} instead.
-     */
-    @Deprecated
-    private TextField newPortInput() {
-        TextField portInput = new TextField();
-        portInput.setPrefColumnCount(autoUploadFiles.getTextFieldWidth());
-        portInput.setPromptText("Enter the port here...");
-        portInput.setTooltip(new Tooltip("Port of FTP server"));
-        return portInput;
-    }
-
-    /**
-     * Returns a new {@link TextField} for the username.
-     * @return      {@link TextField} for the username.
-     * @deprecated  Use {@link #newTextField(String, Tooltip)} instead.
-     */
-    @Deprecated
-    private TextField newUsernameInput() {
-        TextField usernameInput = new TextField();
-        usernameInput.setPrefColumnCount(autoUploadFiles.getTextFieldWidth());
-        usernameInput.setPromptText("Enter the username here...");
-        usernameInput.setTooltip(new Tooltip("Username for the FTP server"));
-        return usernameInput;
-    }
-
-    /**
      * Returns a new {@link PasswordField} for the password.
      * @return  {@link PasswordField} for the password.
      */
@@ -228,20 +186,6 @@ public class MainWindow implements Runnable {
         passwordInput.setPromptText("Enter the password here...");
         passwordInput.setTooltip(new Tooltip("Password for the FTP server"));
         return passwordInput;
-    }
-
-    /**
-     * Returns a new {@link TextField} for the upload path.
-     * @return      {@link TextField} for the upload path.
-     * @deprecated  Use {@link #newTextField(String, Tooltip)} instead.
-     */
-    @Deprecated
-    private TextField newUploadPathInput(String path) {
-        TextField uploadPathInput = new TextField();
-        uploadPathInput.setPrefColumnCount(autoUploadFiles.getTextFieldWidth());
-        uploadPathInput.setPromptText("Enter the upload path here...");
-        uploadPathInput.setTooltip(new Tooltip("Path on the FTP server to upload the file(s) to"));
-        return uploadPathInput;
     }
 
     /**
@@ -258,50 +202,6 @@ public class MainWindow implements Runnable {
         checkBox.setSelected(setSelected);
         checkBox.setTooltip(tooltip);
         return checkBox;
-    }
-
-    /**
-     * Returns a {@link Tooltip} for the "Reuse SSL" {@link CheckBox}.
-     * @return      {@link Tooltip} for the "Reuse SSL" {@link CheckBox}.
-     * @deprecated  Unnecessary; tooltip should be instantiated directly instead of in function call.
-     */
-    @Deprecated
-    private Tooltip newReuseSslTooltip() {
-        return new Tooltip("If checked, will reuse SSL session from control transport for data transport.\n" +
-                "If unchecked, will create new SSL session for data transport.");
-    }
-
-    /**
-     * Returns a {@link Tooltip} for the "Passive Mode" {@link CheckBox}.
-     * @return      {@link Tooltip} for the "Passive Mode" {@link CheckBox}.
-     * @deprecated  Unnecessary; tooltip should be instantiated directly instead of in function call.
-     */
-    @Deprecated
-    private Tooltip newPassiveModeTooltip() {
-        return new Tooltip("If checked, will transfer data over random port selected by server.\n" +
-                "If unchecked, will transfer data over same port as control transport.");
-    }
-
-    /**
-     * Returns a {@link Tooltip} for the "Explicit" {@link CheckBox}.
-     * @return      {@link Tooltip} for the "Explicit" {@link CheckBox}.
-     * @deprecated  Unnecessary; tooltip should be instantiated directly instead of in function call.
-     */
-    @Deprecated
-    private Tooltip newExplicitTooltip() {
-        return new Tooltip("If checked, will initiate TLS encryption after connecting to the server.\n" +
-                "If unchecked, will initiate TLS encryption immediately after connecting to the server on port 990.");
-    }
-
-    /**
-     * Returns a {@link Tooltip} for the "Print Errors" {@link CheckBox}.
-     * @return      {@link Tooltip} for the "Print Errors" {@link CheckBox}.
-     * @deprecated  Unnecessary; tooltip should be instantiated directly instead of in function call.
-     */
-    @Deprecated
-    private Tooltip newPrintErrorsTooltip() {
-        return new Tooltip("If checked, console will print errors encountered during upload.\n" +
-                "If unchecked, console will only print FTP commands.");
     }
 
     /**
@@ -378,10 +278,18 @@ public class MainWindow implements Runnable {
     private Button newCancelButton() {
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> {
-            autoUploadFiles.getProperties().setProperty("hostname", hostnameInput.getText());
-            autoUploadFiles.getProperties().setProperty("port", portInput.getText());
-            autoUploadFiles.getProperties().setProperty("username", usernameInput.getText());
-            autoUploadFiles.getProperties().setProperty("uploadPath", uploadPathInput.getText());
+            if(hostnameInput.getText() != null) {
+                autoUploadFiles.getProperties().setProperty("hostname", hostnameInput.getText());
+            }
+            if(portInput.getText() != null) {
+                autoUploadFiles.getProperties().setProperty("port", portInput.getText());
+            }
+            if(usernameInput.getText() != null) {
+                autoUploadFiles.getProperties().setProperty("username", usernameInput.getText());
+            }
+            if(uploadPathInput.getText() != null) {
+                autoUploadFiles.getProperties().setProperty("uploadPath", uploadPathInput.getText());
+            }
             autoUploadFiles.exit(saveSettingsCheckbox.isSelected());
         });
         cancelButton.setCancelButton(true);
