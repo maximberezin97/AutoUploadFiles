@@ -31,20 +31,12 @@ public class MainWindow implements Runnable {
     private Label passwordLabel;
     private Label uploadPathLabel;
     private Label saveSettingsLabel;
-    private Label reuseSslLabel;
-    private Label passiveModeLabel;
-    private Label explicitLabel;
-    private Label printErrorsLabel;
     private TextField hostnameInput;
     private TextField portInput;
     private TextField usernameInput;
     private PasswordField passwordInput;
     private TextField uploadPathInput;
     private CheckBox saveSettingsCheckbox;
-    private CheckBox reuseSslCheckbox;
-    private CheckBox passiveModeCheckbox;
-    private CheckBox explicitCheckbox;
-    private CheckBox printErrorsCheckbox;
 
     /**
      * Empty constructor for the main window.
@@ -58,10 +50,6 @@ public class MainWindow implements Runnable {
         passwordLabel = new Label("Password:");
         uploadPathLabel = new Label("Upload Path:");
         saveSettingsLabel = new Label("Save Settings:");
-        reuseSslLabel = new Label("Reuse SSL:");
-        passiveModeLabel = new Label("Passive Mode:");
-        explicitLabel = new Label("Explicit Mode:");
-        printErrorsLabel = new Label("Debug:");
         hostnameInput = newTextField("Enter the hostname here...", new Tooltip("Hostname of FTP server"));
         portInput = newTextField("Enter the port here...", new Tooltip("Port of the FTP server"));
         usernameInput = newTextField("Enter the username here...", new Tooltip("Username for the FTP server"));
@@ -71,18 +59,6 @@ public class MainWindow implements Runnable {
         saveSettingsCheckbox = newCheckbox(false, new Tooltip(
                 "If checked, current settings will be saved for future use.\n" +
                 "If unchecked, settings will be blank in future use."));
-        reuseSslCheckbox = newCheckbox(true, new Tooltip(
-                "If checked, will reuse SSL session from control transport for data transport.\n" +
-                "If unchecked, will create new SSL session for data transport."));
-        passiveModeCheckbox = newCheckbox(true, new Tooltip(
-                "If checked, will transfer data over random port selected by server.\n" +
-                "If unchecked, will transfer data over same port as control transport."));
-        explicitCheckbox = newCheckbox(true, new Tooltip(
-                "If checked, will initiate TLS encryption after connecting to the server.\n" +
-                "If unchecked, will initiate TLS encryption immediately after connecting to the server on port 990."));
-        printErrorsCheckbox = newCheckbox(true, new Tooltip(
-                "If checked, console will print errors encountered during upload.\n" +
-                "If unchecked, console will only print FTP commands."));
         autoUploadFiles = null;
     }
 
@@ -135,8 +111,7 @@ public class MainWindow implements Runnable {
         gridTop.add(usernameInput, 1, 2);
         gridTop.add(passwordInput, 1, 3);
         gridTop.add(uploadPathInput, 1, 4);
-        HBox hboxCheckbox = new HBox(6, saveSettingsLabel, saveSettingsCheckbox, reuseSslLabel, reuseSslCheckbox,
-                passiveModeLabel, passiveModeCheckbox, explicitLabel, explicitCheckbox, printErrorsLabel, printErrorsCheckbox);
+        HBox hboxCheckbox = new HBox(6, saveSettingsLabel, saveSettingsCheckbox);
         VBox vboxGridTop = new VBox(10, gridTop, hboxCheckbox);
 
         VBox vboxFileLabels = new VBox(10, new Label("No file(s) selected."));
@@ -245,10 +220,6 @@ public class MainWindow implements Runnable {
                 String username = usernameInput.getText();
                 String password = passwordInput.getText();
                 String uploadPath = uploadPathInput.getText();
-                boolean reuseSsl = reuseSslCheckbox.isSelected();
-                boolean passiveMode = passiveModeCheckbox.isSelected();
-                boolean implicit = !explicitCheckbox.isSelected();
-                boolean printErrors = printErrorsCheckbox.isSelected();
                 if(hostname.equals("")) {
                     autoUploadFiles.showAlert("Please enter the hostname.", Alert.AlertType.WARNING);
                 } else if(port == -1) {
@@ -260,8 +231,7 @@ public class MainWindow implements Runnable {
                 } else if (uploadPath.equals("")) {
                     autoUploadFiles.showAlert("Please enter the upload path.", Alert.AlertType.WARNING);
                 } else {
-                    autoUploadFiles.startUploaderTask(hostname, port, username, password, uploadPath,
-                            reuseSsl, passiveMode, implicit, printErrors, files);
+                    autoUploadFiles.startUploaderTask(hostname, port, username, password, uploadPath, files);
                 }
             } else {
                 autoUploadFiles.showAlert("Please select the file(s).", Alert.AlertType.WARNING);

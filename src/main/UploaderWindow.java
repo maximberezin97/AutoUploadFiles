@@ -155,7 +155,7 @@ public class UploaderWindow implements Runnable {
     private Button newCloseButton() {
         Button closeButton = new Button("Close");
         closeButton.setOnAction(e -> {
-            autoUploadFiles.redirectOutput(System.out, true);
+            autoUploadFiles.redirectOutput(System.out);
             Stage stage = (Stage) closeButton.getScene().getWindow();
             stage.close();
             if(autoUploadFiles.getUploaderTask().isRunning()) {

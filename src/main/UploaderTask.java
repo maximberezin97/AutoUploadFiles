@@ -36,10 +36,6 @@ public class UploaderTask extends Task<UploaderTaskResult> {
     private String username;
     private String password;
     private String uploadPath;
-    private boolean reuseSsl;
-    private boolean passiveMode;
-    private boolean implicit;
-    private boolean printErrors;
     private List<File> files;
     private File currentFile;
     private FTPSClient ftp;
@@ -56,9 +52,6 @@ public class UploaderTask extends Task<UploaderTaskResult> {
         this.username = "";
         this.password = "";
         this.uploadPath = "";
-        this.reuseSsl = true;
-        this.passiveMode = true;
-        this.implicit = true;
         this.files = null;
         this.ftp = null;
         this.currentFile = null;
@@ -84,24 +77,16 @@ public class UploaderTask extends Task<UploaderTaskResult> {
      * @param username      Username for the FTP server login.
      * @param password      Password for the FTP server login.
      * @param uploadPath    Path on FTP server to upload the file(s) to.
-     * @param reuseSsl      Reuse or create new SSL context.
-     * @param passiveMode   Passive or active mode connection.
-     * @param implicit      Implicit or explicit connection.
-     * @param printErrors   Print errors in console or {@link UploaderWindow}, used for debugging.
      * @param files         File(s) to upload to FTP server.
      */
-    public UploaderTask(AutoUploadFiles autoUploadFiles, String hostname, int port, String username, String password, String uploadPath,
-                        boolean reuseSsl, boolean passiveMode, boolean implicit, boolean printErrors, List<File> files) {
+    public UploaderTask(AutoUploadFiles autoUploadFiles, String hostname, int port,
+                        String username, String password, String uploadPath, List<File> files) {
         this(autoUploadFiles);
         this.hostname = hostname;
         this.port = port;
         this.username = username;
         this.password = password;
         this.uploadPath = uploadPath;
-        this.reuseSsl = reuseSsl;
-        this.passiveMode = passiveMode;
-        this.implicit = implicit;
-        this.printErrors = printErrors;
         this.files = files;
     }
 
@@ -133,14 +118,10 @@ public class UploaderTask extends Task<UploaderTaskResult> {
         long timeEnd;
         boolean fileStored = false;
 
-        if(reuseSsl) {
-            ftp = getAltFtpsClient(implicit);
-        } else {
-            ftp = getRegFtpsClient(implicit);
-        }
+        ftp = getAltFtpsClient(false);
 
         PrintStream printStream = newPrintStream();
-        autoUploadFiles.redirectOutput(printStream, printErrors);
+        autoUploadFiles.redirectOutput(printStream);
         ftp.addProtocolCommandListener(new PrintCommandListener(printStream, true));
         ftp.setCopyStreamListener(newCopyStreamAdapter());
 
@@ -156,11 +137,9 @@ public class UploaderTask extends Task<UploaderTaskResult> {
                 updateTitle("Configuring FTP connection...");
                 ftp.setFileType(FTP.BINARY_FILE_TYPE);
                 ftp.setFileTransferMode(FTP.BINARY_FILE_TYPE);
-                if(passiveMode) {
-                    ftp.execPBSZ(0);
-                    ftp.execPROT("P");
-                    ftp.enterLocalPassiveMode();
-                }
+                ftp.execPBSZ(0);
+                ftp.execPROT("P");
+                ftp.enterLocalPassiveMode();
                 ftp.changeWorkingDirectory(uploadPath);
                 InputStream fileStream;
                 timeStart = System.currentTimeMillis();
@@ -192,7 +171,9 @@ public class UploaderTask extends Task<UploaderTaskResult> {
      * Returns an {@link FTPSClient} instance as provided by the Apache Commons Net library.
      * @param isExplicit    Explicit or implicit connection.
      * @return              {@link FTPSClient} with standard storeFile().
+     * @deprecated          Never used in Minimal branch.
      */
+    @Deprecated
     private FTPSClient getRegFtpsClient(boolean isExplicit) {
         return new FTPSClient(isExplicit) {
             @Override

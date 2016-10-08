@@ -58,16 +58,11 @@ public class AutoUploadFiles extends Application {
      * @param username      Username for the FTP server login.
      * @param password      Password for the FTP server login.
      * @param uploadPath    Path on FTP server to upload to.
-     * @param reuseSsl      Reuse or create new SSL context for upload connection.
-     * @param passiveMode   Passive or active mode for the FTP server.
-     * @param implicit      Implicit or explicit connection for the FTP server.
-     * @param printErrors   Redirect error {@link PrintStream} for errors, used for debugging error messages.
      * @param files         {@link File}(s) to upload to the FTP server.
      */
-    public void startUploaderTask(String hostname, int port, String username, String password, String uploadPath,
-                                  boolean reuseSsl, boolean passiveMode, boolean implicit, boolean printErrors, List<File> files) {
-        uploaderTask = new UploaderTask(this, hostname, port, username, password, uploadPath,
-                reuseSsl, passiveMode, implicit, printErrors, files);
+    public void startUploaderTask(String hostname, int port, String username,
+                                  String password, String uploadPath, List<File> files) {
+        uploaderTask = new UploaderTask(this, hostname, port, username, password, uploadPath, files);
         uploaderTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, e -> {
             UploaderTaskResult result = uploaderTask.getValue();
             showAlert(result.getMessage(), result.getAlertType());
@@ -115,13 +110,10 @@ public class AutoUploadFiles extends Application {
     /**
      * Redirects System.out to {@link PrintStream} prs.
      * @param prs               {@link PrintStream} to redirect {@link System}.out to.
-     * @param transferErrors    Does or does not redirect System.err to prs, used for debugging.
      */
-    public void redirectOutput(PrintStream prs, boolean transferErrors) {
+    public void redirectOutput(PrintStream prs) {
         System.setOut(prs);
-        if(transferErrors) {
-            System.setErr(prs);
-        }
+        System.setErr(prs);
     }
 
     /**
