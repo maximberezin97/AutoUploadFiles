@@ -5,8 +5,12 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.DosFileAttributes;
 import java.util.List;
 import java.util.Properties;
 
@@ -16,16 +20,20 @@ import java.util.Properties;
  * and the {@link Application}.start() function to be run by JavaFX.
  * Also handles the creation and management of JavaFX Application Thread
  * and the Task thread.
+ * Also handles persistent data. Retrieves properties of existing
+ * .properties file if one exists, creates .properties file if user wants
+ * to save settings. File is hidden (dotted file is hidden on Unix,
+ * "hidden" DOS attribute set on Windows).
  */
 public class AutoUploadFiles extends Application {
     public static final String name = "AutoUploadFiles";
-    public static final String version = "3.8";
+    public static final String version = "3.9";
     public static final String dialogTitle = name+" "+version;
     public static int textFieldWidth = 25;
     public Image icon = new Image(getClass().getResourceAsStream("icon.png"));
     private UploaderTask uploaderTask;
     private Properties properties;
-    private File propertiesFile = new File("autoUploadFiles.properties");
+    private File propertiesFile = new File(".autoUploadFiles.properties");
 
     public static void main(String[] args) {
         launch(args);
@@ -41,7 +49,7 @@ public class AutoUploadFiles extends Application {
     public void start(Stage primaryStage) throws Exception {
         properties = new Properties();
         if(propertiesFile.exists()) {
-            FileInputStream inputStream = new FileInputStream("autoUploadFiles.properties");
+            FileInputStream inputStream = new FileInputStream(propertiesFile);
             properties.load(inputStream);
             inputStream.close();
         }
@@ -92,14 +100,21 @@ public class AutoUploadFiles extends Application {
 
     /**
      * Saves settings if checkbox is checked and exits program.
+     * If OS is Windows, sets "hidden" DOS attribute.
      * @param saveSettings  Saves settings if checkbox is checked.
      */
     public void exit(boolean saveSettings) {
         if(saveSettings) {
             try {
-                FileOutputStream outputStream = new FileOutputStream("autoUploadFiles.properties");
+                FileOutputStream outputStream = new FileOutputStream(propertiesFile);
                 properties.store(outputStream, null);
                 outputStream.close();
+                if(SystemUtils.IS_OS_WINDOWS) {
+                    Path propertiesNioPath = propertiesFile.toPath();
+                    Files.setAttribute(propertiesNioPath, "dos:hidden", true);
+                    DosFileAttributes attr = Files.readAttributes(propertiesNioPath, DosFileAttributes.class);
+                    System.out.println("isHidden? "+attr.isHidden());
+                }
             } catch(Exception e) {
                 e.printStackTrace();
             }
